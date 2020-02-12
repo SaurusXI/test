@@ -1,8 +1,9 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
+import pickle
 
-data = pd.read_csv('train.csv').values
-test_data = pd.read_csv('test.csv').values
+data = pd.read_csv('train.csv')
+test_data = pd.read_csv('test.csv')
 
 class processor:
     def process_data(self, data):
@@ -17,14 +18,20 @@ class predictor:
 
 Processor = processor()
 processed_data = Processor.process_data(data)
-#print(processed_data)
 model = DecisionTreeClassifier()
 
-print(processed_data[:, 1:3])
-#print(processed_data[:, 2].reshape(-1, 1))
+X_train, y_train = processed_data.iloc[:, 1].values.reshape(-1, 1), processed_data.iloc[:, 2].values
 
-model.fit(processed_data[:, 1:3], processed_data[:, 2])
+
+model.fit(X_train, y_train)
 
 Predictor = predictor(model)
 
-print(Predictor.predict(test_data[:, 1]).reshape(-1, 1))
+X_test = test_data.iloc[:, 1].values.reshape(-1, 1)
+print(Predictor.predict(X_test))
+
+with open('processor.pickle', 'wb') as f:
+    pickle.dump(Processor, f)
+
+with open('predictor.pickle', 'wb') as f:
+    pickle.dump(Predictor, f)
